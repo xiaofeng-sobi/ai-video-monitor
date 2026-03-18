@@ -1,0 +1,56 @@
+# AI Video Monitor - GitHub Actions 工作流
+# 每天自动运行，抓取 AI 视频行业动态并生成报告
+
+name: Daily AI Video Report
+
+on:
+  # 定时任务：每天北京时间 9:00 执行
+  schedule:
+    - cron: '0 1 * * *'  # UTC 时间 1:00 = 北京时间 9:00
+  
+  # 支持手动触发
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 步骤 1: 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 步骤 2: 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      # 步骤 3: 安装依赖
+      - name: Install dependencies
+        run: npm ci
+      
+      # 步骤 4: 运行爬虫生成报告
+      - name: Generate daily report
+        run: node main.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 步骤 5: 提交并推送新生成的报告
+      - name: Commit and push reports
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 📊 [Auto] 生成 AI 视频行业日报 - ${{ github.run_number }}
+          file_pattern: 'reports/*.md'
+          commit_options: '--no-verify'
+          skip_checkout: true
+        
+      # 步骤 6: 创建 GitHub Issue 通知（可选）
+      - name: Create issue notification
+        if: always()
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 📊 AI 视频行业动态日报 - ${{ github.run_number }}
+          content-filepath: ./reports/latest_report.md
+          labels: daily-report, automated

@@ -1,0 +1,23 @@
+{
+  "name": "ai-video-monitor-github",
+  "version": "1.0.0",
+  "description": "AI Video Industry Daily Report - GitHub Actions Version",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node main.js"
+  },
+  "keywords": [
+    "ai",
+    "video",
+    "monitor",
+    "daily-report",
+    "github-actions"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
